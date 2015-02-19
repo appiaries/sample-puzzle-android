@@ -1,4 +1,4 @@
-Puzzle Game App Demo for Appiaries
+Puzzle Game App Demo for Appiaries (Android)
 ===========================
 
 ## About This App
@@ -202,6 +202,9 @@ http://docs.appiaries.com/?p=13580&lang=en
 
 in Japanese  
 http://docs.appiaries.com/?p=13576
+
+Also, iOS version available on GitHub.  
+https://github.com/appiaries/sample-puzzle-ios
 
 Appiaries  
 http://www.appiaries.com/
