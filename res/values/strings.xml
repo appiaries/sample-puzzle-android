@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Puzzle</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+	
+	<string name="content_info">ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。</string>
+	<string name="btnSkip">スキップ</string>
+	
+	<string name="title_activity_top">アプリタイトル</string>
+	<string name="btnStart">スタート</string>
+	<string name="btnRanking">ランキング</string>
+	<string name="txtStage">ステージ１</string>
+	
+	<string name="txtResultStage">STAGE 1</string>
+	<string name="lbResult">結果：</string>
+	<string name="txtResult">秒</string>
+	<string name="lbTimeRanking">クリア時間ランキング   :</string>
+	<string name="txtTimeRanking">位/</string>
+	<string name="lbFirsComeRanking">先着ランキング       :</string>	
+	
+	<string name="txtId">●ID</string>
+	<string name="txtPassword">●パスワード</string>
+	<string name="txtPasswordReminder">→パスワードを忘れた方はこちら</string>
+	<string name="mesError">入力された内容に誤りがあります。</string>
+	<string name="mesError409">入力されたIDは既に使用済みです。別のIDをご入力ください</string>	
+		
+	<string name="txtPasswordReminderDecs">パスワードをお忘れの方は、下記フォームより空メールを送信ください。折り返し自動メールにてパスワードをご連絡致します。</string>
+	<string name="txtPasswordReminderEmail">●登録メールアドレス</string>	
+		
+	<string name="txtEmailAddress">●メールアドレス</string>
+	<string name="txtNickName">●ニックネーム</string>
+	<string name="mesDecsUseID">※登録後に変更できません。</string>
+	<string name="mesDecsNickName">※登録後に変更できません。</string>
+		
+	
+	<string name="btnLogin">ログイン</string>
+	<string name="btnSignUp">新規登録</string>
+	
+	<string name="btnSend">送信</string>
+	<string name="btnOk">OK</string>
+	
+	<string name="btnHome">ホーム</string>
+	<string name="textRanking">ランキング</string>
+	<string name="btnResetRanking">先着リセット</string>
+	<string name="tab_Time">時間</string>
+	<string name="tab_FirstCome">先着</string>
+	<string name="sbu_Tab_Time">時間 (全500人中)</string>
+	<string name="sbu_Tab_FirstCome">先着 (全500人中)</string>
+	
+	<string name="place">位</string>	
+</resources>
