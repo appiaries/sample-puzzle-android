@@ -1,85 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.appiaries.puzzle"
-    android:versionCode="1"
-    android:versionName="1.0" >
+          package="com.appiaries.puzzle"
+          android:versionCode="1"
+          android:versionName="1.0" >
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
+  <uses-sdk
+      android:minSdkVersion="14"
+      android:targetSdkVersion="19" />
 
-   
-    <!-- Network State Permissions to detect Internet status -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <!-- Network State Permissions to detect Internet status -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <permission
+      android:name="com.appiaries.puzzle.permission.C2D_MESSAGE"
+      android:protectionLevel="signature" />
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <permission android:name="com.appiaries.puzzle.permission.C2D_MESSAGE" android:protectionLevel="signature"></permission>
-    <uses-permission android:name="com.appiaries.puzzle.permission.C2D_MESSAGE"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="com.appiaries.puzzle.permission.C2D_MESSAGE" />
+  <uses-permission android:name="android.permission.VIBRATE" />
 
-    <application
-        android:allowBackup="true"
-        android:debuggable="true"     
-        android:icon="@drawable/icon"
+  <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <android:uses-permission
+      android:name="android.permission.READ_EXTERNAL_STORAGE"
+      android:maxSdkVersion="18" />
+
+  <application
+      android:allowBackup="true"
+      android:debuggable="true"
+      android:icon="@drawable/icon"
+      android:label="@string/app_name"
+      android:logo="@drawable/icon"
+      android:theme="@style/AppTheme">
+    <activity
+        android:name=".activities.PlayActivity"
         android:label="@string/app_name"
-        android:logo="@drawable/icon"  
-        android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.appiaries.puzzle.activities.PlayActivity"
-            android:launchMode="singleTask"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.SampleActivity"
-			android:label="" >
-		</activity>	
-		<activity
-            android:name="com.appiaries.puzzle.activities.LoginActivity"
-            android:launchMode="singleTask"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.SignUpActivity"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.PasswordReminderActivity"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.TopActivity"
-            android:launchMode="singleTask"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.IntroductionActivity"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.GameResultActivity"
-            android:label="" >
-        </activity>
-        <activity
-            android:name="com.appiaries.puzzle.activities.RankingActivity"            
-            android:label="ランキング">
-        </activity>        
-        <activity
-            android:name="com.appiaries.puzzle.activities.SplashActivity"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>       
-
-    </application>
+        android:launchMode="singleTask">
+    </activity>
+    <activity
+        android:name=".activities.SampleActivity"
+        android:label="@string/app_name">
+    </activity>
+    <activity
+        android:name=".activities.LoginActivity"
+        android:label="@string/app_name"
+        android:launchMode="singleTask">
+    </activity>
+    <activity
+        android:name=".activities.SignUpActivity"
+        android:label="@string/app_name">
+    </activity>
+    <activity
+        android:name=".activities.PasswordReminderActivity"
+        android:label="@string/app_name"
+        android:windowSoftInputMode="stateAlwaysVisible">
+    </activity>
+    <activity
+        android:name=".activities.TopActivity"
+        android:label="@string/app_name"
+        android:launchMode="singleTask">
+    </activity>
+    <activity
+        android:name=".activities.IntroductionActivity"
+        android:label="@string/app_name">
+    </activity>
+    <activity
+        android:name=".activities.PlayResultActivity"
+        android:label="@string/play_result__title">
+    </activity>
+    <activity
+        android:name=".activities.RankingActivity"
+        android:label="@string/ranking__title">
+    </activity>
+    <activity
+        android:name=".activities.SplashActivity"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity
+        android:name=".activities.ErrorActivity"
+        android:label="@string/app_name">
+    </activity>
+  </application>
 
 </manifest>

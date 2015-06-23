@@ -1,91 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="match_parent" >
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent">
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+      <RelativeLayout
+          android:id="@+id/layout_group_stage"
+          android:layout_width="fill_parent"
+          android:layout_height="80dp"
+          android:layout_marginBottom="25dp"
+          android:layout_marginLeft="10dp"
+          android:layout_marginRight="10dp"
+          android:layout_marginTop="100dp"
+          android:background="@drawable/my_relative"
+          android:gravity="center"
+          android:orientation="horizontal"
+          android:visibility="gone">
+        <Button
+            android:id="@+id/button_previous"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/image_pre" />
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/image_next" />
+        <TextView
+            android:id="@+id/text_stage"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button_next"
+            android:layout_alignBottom="@+id/button_next"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:textSize="20sp" />
+      </RelativeLayout>
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="230dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:gravity="center"
-                android:visibility="invisible"
-                android:text="@string/title_activity_top"
-                android:textSize="20dp" />
+      <LinearLayout
+          android:id="@+id/layout_group_submit"
+          style="@style/LayoutVerticalStyle"
+          android:gravity="center_horizontal"
+          android:visibility="gone">
+        <Button
+            android:id="@+id/button_start"
+            style="@style/ButtonStyle"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/my_button"
+            android:text="@string/top__start_button"
+            android:textColor="@android:color/white" />
+        <Button
+            android:id="@+id/button_ranking"
+            style="@style/ButtonStyle"
+            android:background="@drawable/my_button"
+            android:text="@string/top__ranking_button"
+            android:textColor="@android:color/white" />
+      </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/btnGroupStage"
-                android:layout_width="fill_parent"
-                android:layout_height="80dp"
-                android:layout_marginBottom="25dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="100dp"
-                android:background="@drawable/my_relative"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone" >
-
-                <Button
-                    android:id="@+id/btn_pre"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/image_pre" />
-
-                <Button
-                    android:id="@+id/btn_next"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/image_next" />
-
-                <TextView
-                    android:id="@+id/text_stage "
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/btn_next"
-                    android:layout_alignBottom="@+id/btn_next"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:textSize="20sp" />
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/btnGroupSubmit"
-                style="@style/LayoutVerticalStyle"
-                android:gravity="center_horizontal"
-                android:visibility="gone" >
-
-                <Button
-                    android:id="@+id/btn_start"
-                    style="@style/ButtonStyle"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/my_button"
-                    android:text="@string/btnStart"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/btn_ranking"
-                    style="@style/ButtonStyle"
-                    android:background="@drawable/my_button"
-                    android:text="@string/btnRanking"
-                    android:textColor="@android:color/white" />
-            </LinearLayout>
-        </LinearLayout>
     </LinearLayout>
+
+  </LinearLayout>
 
 </ScrollView>

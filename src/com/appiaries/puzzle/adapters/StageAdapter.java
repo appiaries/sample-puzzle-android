@@ -1,9 +1,7 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.adapters;
-
-import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,28 +10,27 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.appiaries.puzzle.jsonmodels.*;
+import com.appiaries.puzzle.models.Stage;
 
-public class StageAdapter extends ArrayAdapter<Stage>{
+import java.util.List;
 
-    // Your sent context
-    private Context context;
-    // Your custom values for the spinner (User)
-    private List<Stage> dataSource;
+public class StageAdapter extends ArrayAdapter<Stage> {
 
-    public StageAdapter(Context context, int textViewResourceId,
-    		List<Stage> values) {
+    private Context mContext;
+    private List<Stage> mDataSource;
+
+    public StageAdapter(Context context, int textViewResourceId, List<Stage> values) {
         super(context, textViewResourceId, values);
-        this.context = context;
-        this.dataSource = values;
+        mContext = context;
+        mDataSource = values;
     }
 
     public int getCount(){
-       return dataSource.size();
+       return mDataSource.size();
     }
 
     public Stage getItem(int position){
-       return dataSource.get(position);
+       return mDataSource.get(position);
     }
 
     public long getItemId(int position){
@@ -46,11 +43,11 @@ public class StageAdapter extends ArrayAdapter<Stage>{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // I created a dynamic TextView here, but you can reference your own  custom layout for each spinner item
-        TextView label = new TextView(context);
+        TextView label = new TextView(mContext);
         label.setTextColor(Color.BLACK);
         // Then you can get the current item using the values array (Users array) and the current position
         // You can NOW reference each method you has created in your bean object (User class)
-        label.setText(dataSource.get(position).getStageName());
+        label.setText(mDataSource.get(position).getName());
 
         // And finally return your dynamic (or custom) view for each spinner item
         return label;
@@ -59,12 +56,12 @@ public class StageAdapter extends ArrayAdapter<Stage>{
     // And here is when the "chooser" is popped up
     // Normally is the same view, but you can customize it if you want
     @Override
-    public View getDropDownView(int position, View convertView,
-            ViewGroup parent) {
-        TextView label = new TextView(context);
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        TextView label = new TextView(mContext);
         label.setTextColor(Color.BLACK);
-        label.setText(dataSource.get(position).getStageName());
+        label.setText(mDataSource.get(position).getName());
 
         return label;
     }
+
 }

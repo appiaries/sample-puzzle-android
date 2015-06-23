@@ -1,13 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.adapters;
 
 import java.util.List;
 
 import com.appiaries.puzzle.R;
-import com.appiaries.puzzle.common.APIHelper;
-import com.appiaries.puzzle.jsonmodels.TimeRanking;
+import com.appiaries.puzzle.common.PreferenceHelper;
+import com.appiaries.puzzle.models.TimeRanking;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -19,86 +19,65 @@ import android.widget.TextView;
 
 
 public class TimeRankingAdapter extends ArrayAdapter<TimeRanking> {
-	private final Context context;
-	private List<TimeRanking> dataSource;
 
-	public TimeRankingAdapter(Context context, List<TimeRanking> values) {
-		super(context, R.layout.jikan_row, values);
+    private static class ViewHolder {
+        public TextView rank;
+        public TextView nickname;
+        public TextView time;
+    }
 
-		this.context = context;
-		this.dataSource = values;		
-	}
+    ViewHolder mViewHolder = new ViewHolder();
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    private final Context mContext;
+    private List<TimeRanking> mDataSource;
+    private String mScoreSuffix;
 
-		PlanetHolder holder = new PlanetHolder();
-		if (convertView == null) {
-			// set up the ViewHolder
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    public TimeRankingAdapter(Context context, List<TimeRanking> values) {
+        super(context, R.layout.list_raw_time_ranking, values);
+        mContext = context;
+        mDataSource = values;
+        mScoreSuffix = context.getResources().getString(R.string.time_ranking__score_suffix);
+    }
 
-			convertView = inflater.inflate(R.layout.jikan_row, parent,
-					false);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-			TextView txtRank = (TextView) convertView
-					.findViewById(R.id.txtRank);
-			TextView txtNickName = (TextView) convertView
-					.findViewById(R.id.txtNickName);
-			TextView txtTime = (TextView) convertView
-					.findViewById(R.id.txtTime);
+        if (convertView == null) {
+            // set up the ViewHolder
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.list_raw_time_ranking, parent, false);
 
-			holder.txtRank = txtRank;
-			holder.txtNickName = txtNickName;
-			holder.txtTime = txtTime;
+            mViewHolder.rank     = (TextView) convertView.findViewById(R.id.text_rank);
+            mViewHolder.nickname = (TextView) convertView.findViewById(R.id.text_nickname);
+            mViewHolder.time     = (TextView) convertView.findViewById(R.id.text_time);
 
-			// store the object with the view.
-			convertView.setTag(holder);
-		} else {
-			// we've just avoided calling findViewById() on resource everytime
-			// just use the viewHolder
-			holder = (PlanetHolder) convertView.getTag();
-		}
+            // store the object with the view.
+            convertView.setTag(mViewHolder);
+        } else {
+            // we've just avoided calling findViewById() on resource every time
+            // just use the viewHolder
+            mViewHolder = (ViewHolder) convertView.getTag();
+        }
 
-		// get data object for current row		
-		TimeRanking info = dataSource.get(position);
-		int rank = position + 1;
-		if (info != null) {			
-			holder.txtRank.setText(rank + "");			
-			holder.txtNickName.setText(info.getNickname());
-			
-			if (info.getUserId().equals(APIHelper.getStringInLocalStorage(
-					context, "user_id")))
-			{
-				holder.txtNickName.setTypeface(Typeface.DEFAULT_BOLD);
-			}
-			else
-			{
-				holder.txtNickName.setTypeface(Typeface.DEFAULT);
-			}
-			
-			holder.txtTime.setText(info.getScore() + " sec");
-		}
+        // get data object for current row
+        TimeRanking ranking = mDataSource.get(position);
+        int rank = position + 1;
+        if (ranking != null) {
+            mViewHolder.rank.setText(String.valueOf(rank));
+            mViewHolder.nickname.setText(ranking.getNickname());
+            if (ranking.getPlayerID().equals(PreferenceHelper.loadPlayerId(mContext))) {
+                mViewHolder.nickname.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                mViewHolder.nickname.setTypeface(Typeface.DEFAULT);
+            }
+            mViewHolder.time.setText(ranking.getScore() + mScoreSuffix);
+        }
 
-		return convertView;
-	}
+        return convertView;
+    }
 
-	/* *********************************
-	 * We use the holder pattern It makes the view faster and avoid finding the
-	 * component *********************************
-	 */
-	private static class PlanetHolder {
+    public synchronized void refreshAdapter(List<TimeRanking> dataitems) {
+        mDataSource.clear();
+    }
 
-		public TextView txtRank;
-		public TextView txtNickName;
-		public TextView txtTime;
-	}
-	
-	/**
-	 * refresAdapter
-	 * @param dataitems
-	 */
-	public synchronized void refreshAdapter(List<TimeRanking> dataitems) {
-		dataSource.clear();
-	}
 }

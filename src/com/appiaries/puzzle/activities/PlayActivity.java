@@ -1,27 +1,28 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.activities;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
+import com.appiaries.baas.sdk.AB;
+import com.appiaries.baas.sdk.ABException;
+import com.appiaries.baas.sdk.ABQuery;
+import com.appiaries.baas.sdk.ABResult;
 import com.appiaries.puzzle.R;
 
-import android.app.Activity;
+import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.BitmapFactory.Options;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -29,336 +30,274 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import com.appiaries.puzzle.common.APIHelper;
-import com.appiaries.puzzle.common.UIHelper;
-import com.appiaries.puzzle.games.*;
+import com.appiaries.puzzle.common.Constants;
+import com.appiaries.puzzle.common.PreferenceHelper;
+import com.appiaries.puzzle.games.CountDownTextView;
 import com.appiaries.puzzle.games.CountDownTextView.CountDownTimerListener;
+import com.appiaries.puzzle.games.TileBoardView;
 import com.appiaries.puzzle.games.TileBoardView.TileBoardViewListener;
-import com.appiaries.puzzle.jsonmodels.FirstComeRanking;
-import com.appiaries.puzzle.jsonmodels.Stage;
-import com.appiaries.puzzle.jsonmodels.TimeRanking;
-import com.appiaries.puzzle.managers.FirstComeRankingManager;
-import com.appiaries.puzzle.managers.FirstComeRankingSeqManager;
-import com.appiaries.puzzle.managers.TimeRankingManager;
+import com.appiaries.puzzle.models.FirstComeRanking;
+import com.appiaries.puzzle.models.FirstComeRankingSequence;
+import com.appiaries.puzzle.models.Stage;
+import com.appiaries.puzzle.models.TimeRanking;
 
-public class PlayActivity extends Activity implements CountDownTimerListener,
-		TileBoardViewListener {
-	
-	private CountDownTextView countDownView;
-	private String stageId = null;
-	private String imageId = null;
-	private final java.util.List<String> mActList = new java.util.ArrayList<String>();
+public class PlayActivity extends BaseActivity implements CountDownTimerListener, TileBoardViewListener {
+    private static final String TAG = PlayActivity.class.getSimpleName();
 
-	ProgressDialog progressBar;
-	private boolean bStartCountDownFlag = false;
+    private TileBoardView mGameBoard;
+    private CountDownTextView mCountDownView;
+    private Stage mStage;
+    private String mStageId = null;
+    private File mImageFile;
+    private boolean mStartCountDownFlag = false;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    private static final int START_DELAY = 3000; // Wait 3 seconds before the game begins
 
-		setContentView(R.layout.activity_play);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Intent intent = getIntent();
-		Stage stageObj = (Stage) intent.getSerializableExtra("stage");
-		imageId = stageObj.getImageId();
-		stageId = APIHelper.getStringInLocalStorage(getApplicationContext(),
-				"stage_id");
-		getActionBar().setTitle(stageObj.getStageName());
+        setupView();
 
-		long countDownTime = stageObj.getTimeLimit();
-		int numberOfWidthPieces = stageObj.getNumberOfHorizontalPieces();
-		int numberOfHeightPieces = stageObj.getNumberOfVerticalPieces();
+        mGameBoard.shuffle();
 
-		// Get Timer Layout
-		final RelativeLayout timerLayout = (RelativeLayout) findViewById(R.id.timer_layout);
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                // Start Count Down
+                mCountDownView.startCountDown();
+                mStartCountDownFlag = true;
+            }
+        }, START_DELAY);
 
-		// Initial CountDownTextView
-		countDownView = new CountDownTextView(getApplicationContext(),
-				PlayActivity.this, countDownTime);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		params.addRule(RelativeLayout.CENTER_VERTICAL);
+//        mCountDownView.startCountDown();
+//        mStartCountDownFlag = true;
+    }
 
-		// Add CountDown View into Main Layout
-		timerLayout.addView(countDownView, params);
+    @Override
+    protected void onDestroy() {
+        if (mCountDownView.isCountingDown()) {
+            mCountDownView.stopCountDown();
+        }
+        super.onDestroy();
+    }
 
-		DisplayMetrics dimension = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dimension);
+    @Override
+    public void onTimeUp() {
+        createAndShowConfirmationDialog(
+                R.string.play__timed_up_confirm_title,
+                R.string.play__timed_up_confirm_message,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+    }
 
-		int screenWidth = dimension.widthPixels;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.play_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-		// Sample Picture
-		Bitmap picture = loadBitmap(imageId + ".jpg");
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sample_menu:
+                if(mStartCountDownFlag){
+                    Intent intent = new Intent(this, SampleActivity.class);
+                    intent.putExtra(Constants.EXTRA_KEY_IMAGE_FILENAME, mImageFile.getName());
+                    intent.putExtra(Constants.EXTRA_KEY_TIME_LIMIT, mCountDownView.getRemainingTime());
+                    startActivity(intent);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-		final TileBoardView gameBoard = (TileBoardView) findViewById(R.id.gameboard);
+    @Override
+    public void onFinish() {
+        mCountDownView.stopCountDown();
 
-		gameBoard.setBackgroundColor(Color.parseColor("#000000"));
+        final int score = (int) mCountDownView.getElapsedTime();
 
-		gameBoard.setTileBoardViewListener(PlayActivity.this);
+        final ProgressDialog progress = createAndShowProgressDialog(R.string.play__progress_sending);
 
-		gameBoard.playWithImage(picture, numberOfWidthPieces,
-				numberOfHeightPieces, screenWidth);
+        Handler mHandler = new Handler();
+        Runnable mRunnable = new Runnable() {
+            @Override
+            public void run() {
 
-		gameBoard.shuffle();
+                String stageId = mStageId;
+                Context context = getApplicationContext();
+                String playerId = PreferenceHelper.loadPlayerId(context);
+                String nickname = PreferenceHelper.loadNickname(context);
 
-		// Wait 3 seconds before the game begins
-		new Handler().postDelayed(new Runnable() {
-			public void run() {
-				// Start Count Down
-				countDownView.startCountDown();
-				bStartCountDownFlag = true;
-			}
-		}, 3000);
-	}
+                try {
+                    // --------------------------------
+                    //  Find Own FirstComeRanking
+                    // --------------------------------
+                    ABQuery queryAllFirstComeRanking = FirstComeRanking.query()
+                            .where(FirstComeRanking.Field.STAGE_ID).equalsTo(stageId)
+                            .and(FirstComeRanking.Field.PLAYER_ID).equalsTo(playerId);
+                    ABResult<List<FirstComeRanking>> resultAllFirstComeRanking = AB.DBService.findSynchronouslyWithQuery(queryAllFirstComeRanking);
+                    List<FirstComeRanking> firstComeRankingList = resultAllFirstComeRanking.getData();
+                    if (firstComeRankingList.size() == 0) {
+                        // --------------------------------
+                        //  Increment Sequence
+                        // --------------------------------
+                        FirstComeRankingSequence sequence = new FirstComeRankingSequence();
+                        long rank = sequence.getNextValueSynchronously();
+                        // --------------------------------
+                        //  Create FirstComeRanking
+                        // --------------------------------
+                        FirstComeRanking ranking = new FirstComeRanking();
+                        ranking.setStageID(stageId);
+                        ranking.setPlayerID(playerId);
+                        ranking.setNickname(nickname);
+                        ranking.setScore(score);
+                        ranking.setRank((int)rank);
+                        ranking.saveSynchronously();
+                    }
 
-	@Override
-	public void onTimeUp() {
-		DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				finish();
-			}
-		};
+                    // --------------------------------
+                    //  Find Own TimeRaking
+                    // --------------------------------
+                    ABQuery queryAllTimeRanking = TimeRanking.query()
+                            .where(TimeRanking.Field.STAGE_ID).equalsTo(stageId)
+                            .and(TimeRanking.Field.PLAYER_ID).equalsTo(playerId);
+                    ABResult<List<TimeRanking>> resultAllTimeRanking = AB.DBService.findSynchronouslyWithQuery(queryAllTimeRanking);
+                    List<TimeRanking> timeRankingList = resultAllTimeRanking.getData();
+                    if (timeRankingList.size() > 0) {
+                        TimeRanking ownTimeRanking = timeRankingList.get(0);
+                        if (score < ownTimeRanking.getScore()) { //NOTE: スコアが小さい方がより高得点
+                            // --------------------------------
+                            //  Update TimeRanking
+                            // --------------------------------
+                            ownTimeRanking.setScore(score);
+                            ownTimeRanking.saveSynchronously();
+                        }
+                    } else {
+                        // --------------------------------
+                        //  Create TimeRanking
+                        // --------------------------------
+                        TimeRanking ranking = new TimeRanking();
+                        ranking.setStageID(stageId);
+                        ranking.setPlayerID(playerId);
+                        ranking.setNickname(nickname);
+                        ranking.setScore(score);
+                        ranking.saveSynchronously();
+                    }
 
-		UIHelper.showNotifyDialog(PlayActivity.this, "残念！時間切れです",
-				dialogListener);
-	}
+                    progress.dismiss();
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.play_menu, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+                    Intent intent = new Intent(PlayActivity.this, PlayResultActivity.class);
+                    intent.putExtra(Constants.EXTRA_KEY_STAGE_ID, stageId);
+                    intent.putExtra(Constants.EXTRA_KEY_SCORE, mCountDownView.getElapsedTime());
+                    startActivity(intent);
+                    finish();
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-		case R.id.sample_menu:
-			if(bStartCountDownFlag){
-				Intent intent = new Intent(this, SampleActivity.class);
-				intent.putExtra("imageId", imageId);
-				intent.putExtra("timeLimit", countDownView.getElaspedTime());
-				startActivity(intent);
-			}
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+                } catch (ABException e) {
+                    progress.dismiss();
+                    showError(PlayActivity.this, e);
+                    e.printStackTrace();
+                }
+            }
+        };
+        mHandler.postDelayed(mRunnable, 2000);
+    }
 
-	/**
-	 * 
-	 * @param stageId
-	 * @param userId
-	 * @param code
-	 * @param time
-	 */
-	private void submitResultPlayer(String stageId, String userId,
-			String nickName, int score) {
+    private void setupView() {
+        setContentView(R.layout.activity_play);
 
-		HashMap<String, Object> dataObj = new HashMap<String, Object>();
-		dataObj.put("stage_id", stageId);
-		dataObj.put("user_id", userId);
-		dataObj.put("nickname", nickName);
-		dataObj.put("score", score);
+        mStage = (Stage) getIntent().getSerializableExtra(Constants.EXTRA_KEY_STAGE);
+        mStageId = PreferenceHelper.loadStageId(getApplicationContext());
 
-		new SendResultGameRegisterAsynTask().execute(dataObj);
-	}
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mStage.getName());
+        }
 
-	private class SendResultGameRegisterAsynTask extends
-			AsyncTask<HashMap<String, Object>, Void, Void> {
+        long countDownTime = mStage.getTimeLimit();
+        int numberOfWidthPieces = mStage.getNumberOfHorizontalPieces();
+        int numberOfHeightPieces = mStage.getNumberOfVerticalPieces();
 
-		@SuppressWarnings("unused")
-		@Override
-		protected Void doInBackground(HashMap<String, Object>... params) {			
-			HashMap<String, Object> data = params[0];
-			String stageId = String.valueOf(data.get("stage_id"));
-			String userId = APIHelper.getStringInLocalStorage(
-					getApplicationContext(), "user_id");
-			int score = (int) data.get("score");
+        // Get Timer Layout
+        final RelativeLayout timerLayout = (RelativeLayout) findViewById(R.id.timer_layout);
 
-			try {
+        // Initial CountDownTextView
+        mCountDownView = new CountDownTextView(PlayActivity.this, PlayActivity.this, countDownTime);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
 
-				// check exist for insert to firstComeRanking collection
-				if (FirstComeRankingManager.getInstance().getInformationList() != null) {
-					Boolean insertFlag = true;
-					List<FirstComeRanking> firstComeRankingList = FirstComeRankingManager
-							.getInstance().getInformationList();
-					for (FirstComeRanking firstComeObj : firstComeRankingList) {
-						if (firstComeObj.getStageId().equals(stageId)
-								&& firstComeObj.getUserId().equals(userId)) {
-							insertFlag = false;
-						}
-					}
+        // Add CountDown View into Main Layout
+        timerLayout.addView(mCountDownView, params);
 
-					// insert new record to firstComeRanking collection using
-					// new sequence
-					if (insertFlag) {
-						int seqNo = FirstComeRankingSeqManager.getInstance()
-								.addSequence(1L);
-						data.put("rank", seqNo);
+        DisplayMetrics dimension = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dimension);
 
-						FirstComeRankingManager.getInstance().registerJsonData(
-								data);
-					}
-				}
+        int screenWidth = dimension.widthPixels;
 
-				// check record exist in timeRanking collection if exist, update
-				// new best score
-				TimeRanking timeRanking = TimeRankingManager.getInstance()
-						.getInformationList(stageId, userId);
-				if (timeRanking.getId() != null) {
-					if (score < timeRanking.getScore()) {
-						TimeRankingManager.getInstance().updateJsonData(
-								timeRanking.getId(), data);
-					}
-				} else {
-					// if not exist, insert new record
-					TimeRankingManager.getInstance().registJsonData(data);
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			return null;
-		}
+        // Search image file
+        File dir = getApplication().getFilesDir();
+        File[] foundFiles = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String filename) {
+                return filename.startsWith(mStage.getImageID() + "-");
+            }
+        });
+        if (foundFiles.length > 0) {
+            mImageFile = foundFiles[0];
 
-		@Override
-		protected void onPostExecute(Void result) {
-			progressBar.dismiss();
-			Intent i = new Intent(PlayActivity.this, GameResultActivity.class);
-			i.putExtra("stageId", stageId);
-			i.putExtra("score", countDownView.getSpentTime());
-			startActivity(i);
-			finish();
-		}
+            // Sample Picture
+            Bitmap picture = loadBitmap(mImageFile);
 
-		@Override
-		protected void onPreExecute() {
-			progressBar = new ProgressDialog(PlayActivity.this);
-			progressBar.setMessage("結果を送信中です...");
-			progressBar.show();
-			progressBar.setCancelable(false);
-		}
+            mGameBoard = (TileBoardView) findViewById(R.id.game_board);
+            mGameBoard.setBackgroundColor(Color.parseColor("#000000"));
+            mGameBoard.setTileBoardViewListener(PlayActivity.this);
+            mGameBoard.playWithImage(picture, numberOfWidthPieces, numberOfHeightPieces, screenWidth);
+        }
 
-	}
+    }
 
-	@Override
-	public void onFinish() {		
-		countDownView.stopCountDown();
-		final int score = (int) countDownView.getSpentTime();
-		Runnable mRunnable;
-		Handler mHandler = new Handler();
-		mRunnable = new Runnable() {
-			@Override
-			public void run() {
-				submitResultPlayer(stageId, APIHelper.getStringInLocalStorage(
-						getApplicationContext(), "user_id"),
-						APIHelper.getStringInLocalStorage(
-								getApplicationContext(), "nickname"), score);
-			}
-		};
-		mHandler.postDelayed(mRunnable, 2000);
+    private Bitmap loadBitmap(File f) {
+        try {
+            // decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            FileInputStream stream1 = new FileInputStream(f);
+            BitmapFactory.decodeStream(stream1, null, o);
+            stream1.close();
 
-	}
+            // Find the correct scale value. It should be the power of 2.
+            final int REQUIRED_SIZE = 1024;
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (true) {
+                if (width_tmp / 2 < REQUIRED_SIZE || height_tmp / 2 < REQUIRED_SIZE) {
+                    break;
+                }
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
 
-	private Bitmap loadBitmap(String strImageName) {
-		try {
-			File f = getApplicationContext().getFileStreamPath(strImageName);
-
-			// decode image size
-			BitmapFactory.Options o = new BitmapFactory.Options();
-			o.inJustDecodeBounds = true;
-			FileInputStream stream1 = new FileInputStream(f);
-			BitmapFactory.decodeStream(stream1, null, o);
-			stream1.close();
-
-			// Find the correct scale value. It should be the power of 2.
-			final int REQUIRED_SIZE = 1024;
-			int width_tmp = o.outWidth, height_tmp = o.outHeight;
-			int scale = 1;
-			while (true) {
-				if (width_tmp / 2 < REQUIRED_SIZE
-						|| height_tmp / 2 < REQUIRED_SIZE)
-					break;
-				width_tmp /= 2;
-				height_tmp /= 2;
-				scale *= 2;
-			}
-
-			// decode with inSampleSize
-			BitmapFactory.Options o2 = new BitmapFactory.Options();
-			o2.inSampleSize = scale;
-			FileInputStream stream2 = new FileInputStream(f);
-			Bitmap bitmap = BitmapFactory.decodeStream(stream2, null, o2);
-			stream2.close();
-			return bitmap;
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	protected Bitmap loadBitmap2(String strImageName) {
-		try {
-			Options o = new Options();
-			o.inJustDecodeBounds = true;
-			File filePath = getApplicationContext().getFileStreamPath(
-					strImageName);
-			FileInputStream fi = new FileInputStream(filePath);
-			BitmapFactory.decodeStream(fi, null, o);
-
-			int targetWidth = 600;
-			int targetHeight = 600;
-
-			if (o.outWidth > o.outHeight && targetWidth < targetHeight) {
-				int i = targetWidth;
-				targetWidth = targetHeight;
-				targetHeight = i;
-			}
-
-			if (targetWidth < o.outWidth || targetHeight < o.outHeight) {
-				double widthRatio = (double) targetWidth / (double) o.outWidth;
-				double heightRatio = (double) targetHeight
-						/ (double) o.outHeight;
-				double ratio = Math.max(widthRatio, heightRatio);
-
-				o.inSampleSize = (int) Math.pow(2,
-						(int) Math.round(Math.log(ratio) / Math.log(0.5)));
-			} else {
-				o.inSampleSize = 1;
-			}
-
-			o.inScaled = false;
-			o.inJustDecodeBounds = false;
-			fi = new FileInputStream(filePath);
-			Bitmap bitmap = BitmapFactory.decodeStream(fi, null, o);
-			if (bitmap == null) {
-				Toast.makeText(this, "Couldn't load image", Toast.LENGTH_LONG)
-						.show();
-			}
-
-			int rotate = 0;
-
-			if (rotate != 0) {
-				Matrix matrix = new Matrix();
-				matrix.postRotate(rotate);
-
-				bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-						bitmap.getHeight(), matrix, true);
-			}
-
-			return bitmap;
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
+            // decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            FileInputStream stream2 = new FileInputStream(f);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream2, null, o2);
+            stream2.close();
+            return bitmap;
+        } catch (IOException e) {
+            showError(PlayActivity.this, new ABException(e));
+        }
+        return null;
+    }
 
 }

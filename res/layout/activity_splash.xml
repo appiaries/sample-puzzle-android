@@ -1,8 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
-    android:background="@drawable/splash_screen"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.appiaries.couponstamps.activities.SplashActivity"
-    tools:ignore="MergeRootFrame" />
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/container"
+             android:background="@drawable/splash_screen"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.appiaries.puzzle.activities.SplashActivity"
+             tools:ignore="MergeRootFrame" />

@@ -1,214 +1,164 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.activities;
 
-import java.util.HashMap;
-
-import org.json.JSONException;
-
+import com.appiaries.baas.sdk.AB;
+import com.appiaries.baas.sdk.ABException;
+import com.appiaries.baas.sdk.ABResult;
+import com.appiaries.baas.sdk.ABStatus;
+import com.appiaries.baas.sdk.ResultCallback;
 import com.appiaries.puzzle.R;
-import com.appiaries.puzzle.common.APIHelper;
-import com.appiaries.puzzle.jsonmodels.Player;
-import com.appiaries.puzzle.managers.PlayerManager;
+import com.appiaries.puzzle.common.Constants;
+import com.appiaries.puzzle.common.PreferenceHelper;
+import com.appiaries.puzzle.common.Validator;
+import com.appiaries.puzzle.models.Player;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 
-/**
- * 
- * @author ntduc
- * 
- */
-@SuppressWarnings("unchecked")
-public class LoginActivity extends Activity {
-	PlanetHolder planetHolder;
-	ProgressDialog progressBar;
+public class LoginActivity extends BaseActivity {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
-		CreateView();
-	}
+    private static class ViewHolder {
+        public TextView errorMessages;
+        public EditText loginId;
+        public EditText password;
+        public TextView forgotPassword;
+        public Button loginButton;
+        public Button signUpButton;
+    }
 
-	private void CreateView() {
+    private ViewHolder mViewHolder;
 
-		planetHolder = new PlanetHolder();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		EditText txtId = (EditText) findViewById(R.id.txtId);
-		EditText txtPassword = (EditText) findViewById(R.id.txtPassword);
-		TextView txtValidation = (TextView) findViewById(R.id.validation);
+        setupView();
+    }
 
-		Button btnLogin = (Button) findViewById(R.id.btnLogin);
-		Button btnSignUp = (Button) findViewById(R.id.btnSignUp);
+    private void setupView() {
+        setContentView(R.layout.activity_login);
 
-		planetHolder.txtValidation = txtValidation;
-		planetHolder.txtId = txtId;
-		planetHolder.txtPassword = txtPassword;
-		planetHolder.btnLogin = btnLogin;
-		planetHolder.btnSignUp = btnSignUp;
+        mViewHolder = new ViewHolder();
+        mViewHolder.errorMessages  = (TextView) findViewById(R.id.text_error_messages);
+        mViewHolder.loginId        = (EditText) findViewById(R.id.edit_login_id);
+        mViewHolder.password       = (EditText) findViewById(R.id.edit_password);
+        mViewHolder.forgotPassword = (TextView) findViewById(R.id.text_forgot_password);
+        mViewHolder.forgotPassword.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View rootView) {
+                Intent intent = new Intent(LoginActivity.this, PasswordReminderActivity.class);
+                startActivity(intent);
+            }
+        });
+        mViewHolder.loginButton    = (Button)   findViewById(R.id.button_login);
+        mViewHolder.loginButton.setOnClickListener(new OnClickListener() {
 
-		planetHolder.btnLogin.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                if (validate()) {
+                    String loginId = mViewHolder.loginId.getText().toString();
+                    String password = mViewHolder.password.getText().toString();
 
-			@Override
-			public void onClick(View arg0) {
-				if (validationFrom(planetHolder)) {
-					String loginId = planetHolder.txtId.getText().toString();
-					String password = planetHolder.txtPassword.getText()
-							.toString();
-					HashMap<String, String> data = new HashMap<String, String>();
-					data.put("loginId", loginId);
-					data.put("password", password);
+                    Player player = new Player();
+                    player.setLoginId(loginId);
+                    player.setPassword(password);
 
-					new SendUserLoginAsynTask().execute(data);
+                    // --------------------------------
+                    //  Log In
+                    // --------------------------------
+                    final ProgressDialog progress = createAndShowProgressDialog(R.string.progress__processing);
+                    player.logIn(new ResultCallback<Player>() {
+                        @Override
+                        public void done(ABResult<Player> result, ABException e) {
+                            progress.dismiss();
+                            if (e == null) {
+                                int code = result.getCode();
+                                if (code == ABStatus.CREATED) {
+                                    Context context = getApplicationContext();
+                                    Player sessionPlayer = AB.Session.getUser();
+                                    PreferenceHelper.savePlayerId(context, sessionPlayer.getID());
+                                    PreferenceHelper.saveToken(context, AB.Session.getToken());
+                                    PreferenceHelper.saveNickname(context, sessionPlayer.getNickname());
 
-				} else {
-					planetHolder.txtValidation.setVisibility(View.VISIBLE);
-				}
-			}
-		});
+                                    Intent intent = new Intent(LoginActivity.this, TopActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    showUnexpectedStatusCodeError(LoginActivity.this, code);
+                                }
+                            } else {
+                                mViewHolder.errorMessages.setVisibility(View.VISIBLE);
+                                if (e.getCode() == ABStatus.UNPROCESSABLE_ENTITY) {
+                                    mViewHolder.errorMessages.setText(R.string.message_error__authentication_failure);
+                                } else {
+                                    mViewHolder.errorMessages.setText(R.string.message_error__wrong_input);
+                                }
+                                showError(LoginActivity.this, e);
+                            }
+                        }
+                    });
 
-		planetHolder.btnSignUp.setOnClickListener(new OnClickListener() {
+                } else {
+                    mViewHolder.errorMessages.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mViewHolder.signUpButton  = (Button) findViewById(R.id.button_signup);
+        mViewHolder.signUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View rootView) {
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
 
-			@Override
-			public void onClick(View rootView) {
+        // for Debug
+        mViewHolder.loginId.setText(R.string.login__default_login_id);
+        mViewHolder.password.setText(R.string.login__default_password);
+    }
 
-				Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
-				startActivity(i);
-			}
-		});
+    private boolean validate() {
+        boolean isValid = true;
+        final String loginId = mViewHolder.loginId.getText().toString();
+        if (TextUtils.isEmpty(loginId) || loginId.trim().length() < Constants.ID_MIN_LENGTH || loginId.trim().length() > Constants.ID_MAX_LENGTH) {
+            mViewHolder.loginId.setBackgroundResource(R.drawable.focus_border_style);
+            isValid = false;
+        } else {
+            mViewHolder.loginId.setBackgroundResource(R.drawable.edit_text_border_style);
+        }
 
-	}
+        final String password = mViewHolder.password.getText().toString();
+        if (!isValidPassword(password) || password.trim().length() < 6) {
+            mViewHolder.password.setBackgroundResource(R.drawable.focus_border_style);
+            isValid = false;
+        } else {
+            mViewHolder.password.setBackgroundResource(R.drawable.edit_text_border_style);
+        }
+        return isValid;
+    }
 
-	/**
-	 * 
-	 * @param planetHolder
-	 * @return
-	 */
-	private boolean validationFrom(final PlanetHolder planetHolder) {
-		boolean flg = true;
-		final String txtId = planetHolder.txtId.getText().toString();
-		if (!isValidPassword(txtId) || txtId.trim().length() < 3) {
-			planetHolder.txtId
-					.setBackgroundResource(R.drawable.focus_border_style);
-			flg = false;
-		} else {
-			planetHolder.txtId
-					.setBackgroundResource(R.drawable.edit_text_border_style);
-		}
+    private boolean isValidPassword(String val) {
+        boolean isValid = false;
+        if (!Validator.isNotEmpty(val)) {
+            mViewHolder.errorMessages.setVisibility(View.VISIBLE);
+            mViewHolder.errorMessages.setText(R.string.message_error__wrong_input);
+        } else if (!Validator.isValidPassword(val)) {
+            mViewHolder.errorMessages.setVisibility(View.VISIBLE);
+            mViewHolder.errorMessages.setText(R.string.message_error__invalid_password);
+        } else {
+            isValid = true;
+        }
+        return isValid;
+    }
 
-		final String pass = planetHolder.txtPassword.getText().toString();
-		if (!isValidPassword(pass) || pass.trim().length() < 6) {
-			planetHolder.txtPassword
-					.setBackgroundResource(R.drawable.focus_border_style);
-			flg = false;
-		} else {
-			planetHolder.txtPassword
-					.setBackgroundResource(R.drawable.edit_text_border_style);
-		}
-		return flg;
-	}
-
-	/**
-	 * validating password and user id not null
-	 * 
-	 * @param val
-	 * @return false with val null else true
-	 */
-	private boolean isValidPassword(String val) {
-		if (val != null && val.trim().length() > 0) {
-			return true;
-		}
-		return false;
-	}
-
-	/* *********************************
-	 * We use the holder pattern It makes the view faster and avoid finding the
-	 * component *********************************
-	 */
-	private static class PlanetHolder {
-
-		public TextView txtValidation;
-		public EditText txtId;
-		public EditText txtPassword;
-		public TextView txtPasswordReminder;
-		public Button btnLogin;
-		public Button btnSignUp;
-	}
-
-	private class SendUserLoginAsynTask extends
-			AsyncTask<HashMap<String, String>, Void, String> {
-
-		@Override
-		protected String doInBackground(HashMap<String, String>... params) {
-			HashMap<String, String> data = params[0];
-			String loginId = data.get("loginId");
-			String password = data.get("password");
-			try {
-				return PlayerManager.getInstance().doLogin(loginId, password,
-						true, getApplicationContext());
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			
-			if (result != null && !result.equals("")) {
-				APIHelper.setStringToLocalStorage(getApplicationContext(),
-						"user_id", result);
-				new getPlayerInfoAsynTask().execute();
-			} else {
-				progressBar.dismiss();
-				planetHolder.txtValidation.setVisibility(View.VISIBLE);
-			}
-
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			progressBar = new ProgressDialog(LoginActivity.this);
-			progressBar.setMessage("Loading....");
-			progressBar.show();
-			progressBar.setCancelable(false);
-		}
-	}
-
-	private class getPlayerInfoAsynTask extends AsyncTask<Void, Void, Player> {
-		@Override
-		protected Player doInBackground(Void... params) {
-			try {
-				return PlayerManager.getInstance().getInformationList();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Player result) {
-			super.onPostExecute(result);
-			progressBar.dismiss();
-			if (result != null) {
-				APIHelper.setStringToLocalStorage(getApplicationContext(),
-						"nickname", result.getNickname());
-				Intent i = new Intent(LoginActivity.this, TopActivity.class);
-				startActivity(i);
-				finish();
-			}
-		}
-
-	}
 }

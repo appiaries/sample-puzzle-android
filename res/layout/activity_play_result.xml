@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/scroll"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+  <LinearLayout
+                android:id="@+id/layout_play_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+    <TextView
+        android:id="@+id/text_stage_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:gravity="center" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:orientation="horizontal">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+      <TextView
+          android:id="@+id/text_result_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:text="@string/play_result__result_label"
+          android:textSize="30sp" />
+      <TextView
+          android:id="@+id/text_own_score"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_result_label"
+          android:textSize="30sp" />
+      <TextView
+          android:id="@+id/text_own_score_suffix_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_own_score"
+          android:text="@string/play_result__score_suffix"
+          android:textSize="30sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="80dp"
+        android:gravity="left"
+        android:orientation="horizontal"
+        android:textSize="32sp">
+      <TextView
+          android:id="@+id/text_own_time_rank_field_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/play_result__time_ranking_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_own_time_rank"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_marginLeft="30dp"
+          android:layout_toRightOf="@+id/text_own_time_rank_field_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_own_time_rank_suffix_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_own_time_rank"
+          android:text="@string/play_result__rank_suffix"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_time_rank_total"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_own_time_rank_suffix_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_time_rank_total_suffix_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_time_rank_total"
+          android:text="@string/play_result__total_suffix"
+          android:textSize="18sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:orientation="horizontal">
+      <TextView
+          android:id="@+id/text_own_first_come_rank_field_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:layout_alignParentTop="true"
+          android:text="@string/play_result__first_come_ranking_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_own_first_come_rank"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_marginLeft="30dp"
+          android:layout_toRightOf="@+id/text_own_first_come_rank_field_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_own_first_come_rank_suffix_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_own_first_come_rank"
+          android:text="@string/play_result__rank_suffix"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_first_come_rank_total"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_own_first_come_rank_suffix_label"
+          android:textSize="18sp" />
+      <TextView
+          android:id="@+id/text_first_come_rank_total_suffix_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_toRightOf="@+id/text_first_come_rank_total"
+          android:text="@string/play_result__total_suffix"
+          android:textSize="18sp" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/button_home"
+        style="@style/ButtonStyle"
+        android:background="@drawable/my_button"
+        android:text="@string/play_result__home_button"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/button_ranking"
+        style="@style/ButtonStyle"
+        android:background="@drawable/my_button"
+        android:text="@string/play_result__ranking_button"
+        android:textColor="@android:color/white" />
+
+  </LinearLayout>
+
+</ScrollView>

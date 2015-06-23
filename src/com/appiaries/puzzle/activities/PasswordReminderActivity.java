@@ -1,13 +1,18 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.activities;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.appiaries.baas.sdk.AB;
+import com.appiaries.baas.sdk.ABException;
+import com.appiaries.baas.sdk.ABResult;
+import com.appiaries.baas.sdk.ABStatus;
+import com.appiaries.baas.sdk.ResultCallback;
 import com.appiaries.puzzle.R;
-import android.app.Activity;
+import com.appiaries.puzzle.common.Validator;
+
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,93 +20,87 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-/**
- * 
- * @author ntduc
- * 
- */
-public class PasswordReminderActivity extends Activity {
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_password_reminder);
-		CreateView();
-	}
+public class PasswordReminderActivity extends BaseActivity {
 
-	private void CreateView() {
+    private static class ViewHolder {
+        public EditText email;
+        public TextView errorMessages;
+        public Button sendButton;
+    }
 
-		final PlanetHolder planetHolder = new PlanetHolder();
+    private ViewHolder mViewHolder;
 
-		EditText txtEmailAddress = (EditText) findViewById(R.id.txtEmailAddress);
 
-		Button btnSend = (Button) findViewById(R.id.btnSend);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		planetHolder.txtEmailAddress = txtEmailAddress;
-		TextView txtValidation = (TextView) findViewById(R.id.validation);
+        setupView();
+    }
 
-		planetHolder.txtValidation = txtValidation;
-		planetHolder.btnSend = btnSend;
+    private void setupView() {
+        setContentView(R.layout.activity_password_reminder);
 
-		planetHolder.btnSend.setOnClickListener(new OnClickListener() {
+        mViewHolder = new ViewHolder();
+        mViewHolder.email         = (EditText) findViewById(R.id.edit_email);
+        mViewHolder.errorMessages = (TextView) findViewById(R.id.text_error_messages);
+        mViewHolder.sendButton    = (Button)   findViewById(R.id.button_send);
+        mViewHolder.sendButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                if (validate()) {
+                    // --------------------------------
+                    //  Reset Password
+                    // --------------------------------
+                    String email = mViewHolder.email.getText().toString();
+                    AB.UserService.resetPasswordForEmail(email, new ResultCallback<Void>() {
+                        @Override
+                        public void done(ABResult<Void> result, ABException e) {
+                            if (e == null) {
+                                int code = result.getCode();
+                                if (code == ABStatus.NO_CONTENT) {
+                                    createAndShowConfirmationDialog(
+                                            R.string.password_reminder__reset_confirm_title,
+                                            R.string.password_reminder__reset_confirm_message,
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Intent intent = new Intent(PasswordReminderActivity.this, LoginActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+                                            }
+                                    );
+                                } else {
+                                    showUnexpectedStatusCodeError(PasswordReminderActivity.this, code);
+                                }
+                            } else {
+                                showError(PasswordReminderActivity.this, e);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
 
-			@Override
-			public void onClick(View arg0) {
+    private boolean validate() {
+        boolean isValid = true;
+        int errorMessage = R.string.message_error__wrong_input;
+        //>> Email
+        String email = mViewHolder.email.getText().toString();
+        if (!Validator.isValidEmail(email)) {
+            mViewHolder.email.setBackgroundResource(R.drawable.focus_border_style);
+            isValid = false;
+        } else {
+            mViewHolder.email.setBackgroundResource(R.drawable.edit_text_border_style);
+        }
 
-				if (validationFrom(planetHolder)) {
-					
-				} else {
-					planetHolder.txtValidation.setVisibility(View.VISIBLE);
-				}
-			}
-		});
+        if (!isValid) {
+            mViewHolder.errorMessages.setText(errorMessage);
+            mViewHolder.errorMessages.setVisibility(View.VISIBLE);
+        }
+        return isValid;
+    }
 
-	}
-
-	private Boolean validationFrom(PlanetHolder planetHolder) {
-		final String emailAddress = planetHolder.txtEmailAddress.getText()
-				.toString();
-		if (!isValidPassword(emailAddress) || !isValidEmail(emailAddress)) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * validating password and user id not null
-	 * 
-	 * @param val
-	 * @return false with val null else true
-	 */
-	private boolean isValidPassword(String val) {
-		if (val != null && val.trim().length() > 0) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * validating email id
-	 * 
-	 * @param email
-	 * @return
-	 */
-	private boolean isValidEmail(String email) {
-		String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-				+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-		Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-		Matcher matcher = pattern.matcher(email);
-		return matcher.matches();
-	}
-
-	/* *********************************
-	 * We use the holder pattern It makes the view faster and avoid finding the
-	 * component *********************************
-	 */
-	private static class PlanetHolder {
-
-		public EditText txtEmailAddress;
-		public TextView txtValidation;
-		public Button btnSend;
-	}
 }

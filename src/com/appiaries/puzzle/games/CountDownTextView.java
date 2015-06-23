@@ -1,92 +1,93 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.games;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 
-public class CountDownTextView extends TextView{
+import com.appiaries.puzzle.R;
 
-	private CountDownTimer countDownTimer;
-	
-	private CountDownTimerListener countDownListener;
+public class CountDownTextView extends TextView {
+    private static final String TAG = CountDownTextView.class.getSimpleName();
 
-	private long elapsedTime = 0;
+    private RemainingTimeCountDownTimer mCountDownTimer;
+    private CountDownTimerListener mCountDownListener;
+    private long mRemainingTime = 0;
+    private long mLimitTime = 0;
+    private String mTimerText;
+    private static final long sINTERVAL = (long) 1 * 1000;
+    private boolean mCountingDown;
+    private String mLabel;
 
-	private long startTime = 0;
+    public CountDownTextView(Context context, CountDownTimerListener listener, long limitTime) {
+        super(context);
 
-	private final long interval = 1 * 1000;
-	
-	private final String timerText = "Time: ";
+        mLimitTime = limitTime;
+        mRemainingTime = limitTime;
 
-	public CountDownTextView(Context context, CountDownTimerListener listener, long timeCountDown) {
-		super(context);
-		
-		this.startTime = timeCountDown;
-		
-		timeCountDown = timeCountDown *1000;
-		
-		countDownTimer = new MyCountDownTimer(timeCountDown, interval);
-		
-		setText(timerText+ String.valueOf(timeCountDown / 1000));
-		
-		setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
-		
-		setTextColor(Color.parseColor("#000000"));
-		
-		countDownListener = listener;
-	}
-	
-	public CountDownTextView(Context context, AttributeSet attributeSet)
-	{
-	    super(context, attributeSet);
-	}
-	
-	public void startCountDown()
-	{
-		countDownTimer.start();
-	}
-	
-	public long getElaspedTime()
-	{
-		return this.elapsedTime;
-	}
-	
-	public long getSpentTime()
-	{
-		return this.startTime - this.elapsedTime;
-	}
-	
-	public void stopCountDown(){
-		countDownTimer.cancel();
-	}
-	public class MyCountDownTimer extends CountDownTimer {
+        mCountDownTimer = new RemainingTimeCountDownTimer(limitTime * 1000, sINTERVAL);
+        mTimerText = context.getResources().getString(R.string.count_down__time);
+        setText(mTimerText + String.valueOf(mLimitTime));
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
+        setTextColor(Color.parseColor("#000000"));
+        mCountDownListener = listener;
+        mLabel = mCountDownListener.getClass().getSimpleName();
+    }
 
-		public MyCountDownTimer(long startTime, long interval) {
-			super(startTime, interval - 500); // fix CountDownTimer bug by increase 500ms of interval value.
-		}
+    public CountDownTextView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+    }
 
-		@Override
-		public void onFinish() {
-			// Raise TimeUp event for PlayActivity
-			countDownListener.onTimeUp();
-		}
+    public long getRemainingTime() {
+        return mRemainingTime;
+    }
 
-		@Override
-		public void onTick(long millisUntilFinished) {
-			elapsedTime = millisUntilFinished / 1000;
-			setText(timerText + elapsedTime);
-		}
+    public long getElapsedTime() {
+        return mLimitTime - mRemainingTime;
+    }
 
-	}
-	
-	public interface CountDownTimerListener{
-		void onTimeUp();
+    public void startCountDown() {
+        mCountDownTimer.start();
+        mCountingDown = true;
+    }
 
-	}
+    public void stopCountDown() {
+        mCountDownTimer.cancel();
+        mCountingDown = false;
+    }
+
+    public boolean isCountingDown() {
+        return mCountingDown;
+    }
+
+    public class RemainingTimeCountDownTimer extends CountDownTimer {
+        public RemainingTimeCountDownTimer(long startTime, long interval) {
+            super(startTime, interval - 500); // fix CountDownTimer bug by increase 500ms of interval value.
+        }
+
+        @Override
+        public void onFinish() {
+            // Raise TimeUp event for PlayActivity
+            mCountDownListener.onTimeUp();
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            mRemainingTime = millisUntilFinished / 1000;
+            setText(mTimerText + mRemainingTime);
+            /* Log.d(TAG, "---- onTick() <"  + mLabel + "> : millisUntilFinished=" + millisUntilFinished + ", text=" + getText()); */
+        }
+
+    }
+
+    public interface CountDownTimerListener {
+        void onTimeUp();
+    }
+
 }

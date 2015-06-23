@@ -1,12 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.activities;
 
 import com.appiaries.puzzle.R;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,88 +13,88 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.appiaries.puzzle.common.UIHelper;
+import com.appiaries.puzzle.common.Constants;
 import com.appiaries.puzzle.games.*;
 import com.appiaries.puzzle.games.CountDownTextView.CountDownTimerListener;
 
-public class SampleActivity extends Activity implements CountDownTimerListener{
+public class SampleActivity extends BaseActivity implements CountDownTimerListener{
 
-	private String imageId = null;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		setContentView(R.layout.activity_sample);
-		final Bundle extras = getIntent().getExtras();		
-		imageId = extras.getString("imageId");
-		long timeCountDownRemain = extras.getLong("timeLimit");
-		
-		// Show Back Button
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+    CountDownTextView mCountDownView;
 
-		// Get Timer Layout
-		final RelativeLayout timerLayout = (RelativeLayout) findViewById(R.id.timer_layout);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// Initial CountDownTextView
-		CountDownTextView countDownView = new CountDownTextView(
-				SampleActivity.this, SampleActivity.this,timeCountDownRemain);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		params.addRule(RelativeLayout.CENTER_VERTICAL);
+        setupView();
 
-		// Add CountDown View into Main Layout
-		timerLayout.addView(countDownView, params);
+        // Start Count Down
+        mCountDownView.startCountDown();
+    }
 
-		// Get Sample Layout
-		final LinearLayout sampleLayout = (LinearLayout) findViewById(R.id.puzzle_layout);
+    @Override
+    protected void onDestroy() {
+        if (mCountDownView.isCountingDown()) {
+            mCountDownView.stopCountDown();
+        }
+        super.onDestroy();
+    }
 
-		SampleImageView sampleView = new SampleImageView(
-				getApplicationContext(), imageId);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-		// Add SampleImageView into Sample Layout
-		sampleLayout.addView(sampleView);
+    @Override
+    public void onTimeUp() {
+        createAndShowConfirmationDialog(
+                R.string.sample__timed_up_confirm_title,
+                R.string.sample__timed_up_confirm_message,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(SampleActivity.this, TopActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
 
-		// Start Count Down
-		countDownView.startCountDown();
-		
-	}
+    private void setupView() {
+        setContentView(R.layout.activity_sample);
 
-	/*
-	 * @Override public boolean onCreateOptionsMenu(Menu menu) { // Inflate the
-	 * menu items for use in the action bar MenuInflater inflater =
-	 * getMenuInflater(); inflater.inflate(R.menu.play_menu, menu); return
-	 * super.onCreateOptionsMenu(menu); }
-	 */
+        // Show Back Button
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			this.finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+        Intent intent = getIntent();
+        String filename = intent.getStringExtra(Constants.EXTRA_KEY_IMAGE_FILENAME);
+        long remainingTime = intent.getLongExtra(Constants.EXTRA_KEY_TIME_LIMIT, 0);
 
-	@Override
-	public void onTimeUp() {
-		DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				Intent i = new Intent(SampleActivity.this, TopActivity.class);
+        // Initialize CountDownTextView
+        mCountDownView = new CountDownTextView(SampleActivity.this, SampleActivity.this, remainingTime);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
 
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // Add CountDown View into Main Layout
+        final RelativeLayout timerLayout = (RelativeLayout) findViewById(R.id.timer_layout);
+        timerLayout.addView(mCountDownView, params);
 
-				startActivity(i);
+        // Add SampleImageView into Sample Layout
+        final LinearLayout sampleLayout = (LinearLayout) findViewById(R.id.puzzle_layout);
+        SampleImageView sampleView = new SampleImageView(getApplicationContext(), filename);
+        sampleLayout.addView(sampleView);
+    }
 
-				finish();
-			}
-		};
-		
-		UIHelper.showNotifyDialog(SampleActivity.this, "残念！時間切れです", dialogListener);	
-	}
 }

@@ -1,138 +1,119 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.activities;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-
-import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.appiaries.baas.sdk.AB;
+import com.appiaries.baas.sdk.ABException;
+import com.appiaries.baas.sdk.ABQuery;
+import com.appiaries.baas.sdk.ABResult;
+import com.appiaries.baas.sdk.ResultCallback;
 import com.appiaries.puzzle.R;
-import com.appiaries.puzzle.jsonmodels.Introduction;
-import com.appiaries.puzzle.managers.IntroductionManager;
+import com.appiaries.puzzle.models.Introduction;
 
-public class IntroductionActivity extends Activity {
+public class IntroductionActivity extends BaseActivity {
+    private static final String TAG = IntroductionActivity.class.getSimpleName();
 
-	List<Introduction> introductionList = new ArrayList<Introduction>();
-	Introduction currentIntroduction = new Introduction();
-	int index = 0;
+    private static class ViewHolder {
+        public TextView content;
+        public Button skipButton;
+        public Button nextButton;
+        public Button previousButton;
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.introduction);
-		CreateView();
-	}
+    private ViewHolder mViewHolder;
 
-	private void CreateView() {
+    List<Introduction> mIntroductionList = new ArrayList<>();
+    Introduction mIntroduction = new Introduction(); // Current introduction
+    int mCurrentIndex = 0;
 
-		final PlanetHolder planetHolder = new PlanetHolder();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Button btnSkip = (Button) findViewById(R.id.btn_skip);
-		Button btnNext = (Button) findViewById(R.id.btn_next);
-		Button btnPre = (Button) findViewById(R.id.btn_pre);
+        setupView();
 
-		planetHolder.btnSkip = btnSkip;
-		planetHolder.btnNext = btnNext;
-		planetHolder.btnPre = btnPre;
+        // --------------------------------
+        //  Find All Introductions
+        // --------------------------------
+        ABQuery query = Introduction.query().orderBy(Introduction.Field.ORDER, ABQuery.SortDirection.ASC);
+        AB.DBService.findWithQuery(query, new ResultCallback<List<Introduction>>() {
+            @Override
+            public void done(ABResult<List<Introduction>> result, ABException e) {
+                if (e == null) {
+                    mIntroductionList = result.getData();
+                    if (mIntroductionList.size() > 0) {
+                        mIntroduction = mIntroductionList.get(mCurrentIndex);
+                        mViewHolder.content.setText(mIntroduction.getContent());
+                    }
+                } else {
+                    showError(IntroductionActivity.this, e);
+                }
+            }
+        });
+    }
 
-		new SelectJsonDataAsyncTask().execute();
+    private void setupView() {
+        setContentView(R.layout.activity_introduction);
 
-		planetHolder.btnSkip.setOnClickListener(new OnClickListener() {
+        mViewHolder = new ViewHolder();
+        mViewHolder.content        = (TextView) findViewById(R.id.content);
+        mViewHolder.skipButton     = (Button)   findViewById(R.id.button_skip);
+        mViewHolder.nextButton     = (Button)   findViewById(R.id.button_next);
+        mViewHolder.previousButton = (Button)   findViewById(R.id.button_previous);
+        mViewHolder.skipButton.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				Intent i = new Intent(IntroductionActivity.this,
-						LoginActivity.class);
-				startActivity(i);
-			}
-		});
+            @Override
+            public void onClick(View arg0) {
+                Intent intent = new Intent(IntroductionActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+        mViewHolder.nextButton.setOnClickListener(new OnClickListener() {
 
-		planetHolder.btnNext.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                if (mIntroductionList != null && mIntroductionList.size() > 0) {
+                    if (mCurrentIndex < mIntroductionList.size() - 1) {
+                        mCurrentIndex++;
+                        mIntroduction = mIntroductionList.get(mCurrentIndex);
+                        mViewHolder.content.setText(mIntroduction.getContent());
+                        mViewHolder.previousButton.setVisibility(View.VISIBLE);
+                        if (mCurrentIndex == mIntroductionList.size() - 1) {
+                            mViewHolder.nextButton.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+            }
+        });
+        mViewHolder.previousButton.setVisibility(View.INVISIBLE);
+        mViewHolder.previousButton.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				if (introductionList != null && introductionList.size() > 0) {
-					if (index < introductionList.size() - 1) {
-						index++;
-						TextView textStage = (TextView) findViewById(R.id.text_ContentInformation);
-						currentIntroduction = introductionList.get(index);
-						textStage.setText(currentIntroduction.getContent());
-			
-						planetHolder.btnPre.setVisibility(View.VISIBLE);
-						if (index == introductionList.size() - 1) {
-							planetHolder.btnNext.setVisibility(View.INVISIBLE);
-						}
-					}
-				}
-			}
-		});
+            @Override
+            public void onClick(View arg0) {
+                if (mIntroductionList != null && mIntroductionList.size() > 0) {
+                    if (mCurrentIndex > 0) {
+                        mCurrentIndex--;
+                        mIntroduction = mIntroductionList.get(mCurrentIndex);
+                        mViewHolder.content.setText(mIntroduction.getContent());
+                        mViewHolder.nextButton.setVisibility(View.VISIBLE);
+                        if (mCurrentIndex == 0) {
+                            mViewHolder.previousButton.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
-		planetHolder.btnPre.setVisibility(View.INVISIBLE);
-		planetHolder.btnPre.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				if (introductionList != null && introductionList.size() > 0) {
-					if (index > 0) {
-						index--;
-						TextView textStage = (TextView) findViewById(R.id.text_ContentInformation);
-						currentIntroduction = introductionList.get(index);
-						textStage.setText(currentIntroduction.getContent());
-						
-						planetHolder.btnNext.setVisibility(View.VISIBLE);
-						if (index == 0) {
-							planetHolder.btnPre.setVisibility(View.INVISIBLE);
-						}
-					}
-				}
-			}
-		});
-	}
-
-	private class SelectJsonDataAsyncTask extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... r) {
-			try {
-				introductionList = IntroductionManager.getInstance()
-						.getIntroductionList();
-			} catch (JSONException e) {				
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {		
-			TextView textStage = (TextView) findViewById(R.id.text_ContentInformation);
-			currentIntroduction = introductionList.get(index);
-			textStage.setText(currentIntroduction.getContent());
-		}
-
-		@Override
-		protected void onPreExecute() {		
-
-		}
-	}
-
-	/* *********************************
-	 * We use the holder pattern It makes the view faster and avoid finding the
-	 * component *********************************
-	 */
-	private static class PlanetHolder {
-		public Button btnSkip;
-		public Button btnNext;
-		public Button btnPre;
-	}
 }

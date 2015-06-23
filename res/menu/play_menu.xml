@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.appiaries.puzzle.PlayActivity" >
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.appiaries.puzzle.PlayActivity" >
 
-    <item
-        android:id="@+id/sample_menu"      
-        android:title="見本"
-        android:showAsAction="always"/>
+  <item
+      android:id="@+id/sample_menu"
+      android:title="@string/play__menu_sample"
+      android:showAsAction="always" />
 
 </menu>

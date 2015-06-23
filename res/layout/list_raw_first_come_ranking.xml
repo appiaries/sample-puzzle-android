@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              style="@style/LayoutVerticalStyle" >
+
+  <LinearLayout
+      style="@style/LayoutHorizontalStyle"
+      android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/text_rank"
+        style="@style/SettingLabelStyle"
+        android:layout_width="20dp"
+        android:layout_marginLeft="0dp"
+        android:layout_weight="0.04"
+        android:gravity="right"
+        android:textSize="20sp" />
+    <TextView
+        android:id="@+id/text_rank_suffix_label"
+        style="@style/SettingLabelStyle"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_weight="0.03"
+        android:text="@string/list_row_first_come_ranking__place"
+        android:textSize="20sp" />
+    <TextView
+        android:id="@+id/text_nickname"
+        style="@style/SettingLabelStyle"
+        android:layout_width="50dp"
+        android:layout_weight="0.30"
+        android:text="@string/list_row_first_come_ranking__nickname_default"
+        android:textSize="20sp" />
+  </LinearLayout>
+
+</LinearLayout>

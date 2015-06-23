@@ -1,6 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.games;
 
 import java.util.ArrayList;
@@ -10,161 +10,146 @@ import java.util.Random;
 import android.graphics.Point;
 
 public class TileBoard {
-	private int xSize;
-	private int ySize;
-	private int[][] tiles;
-	
-	public int getXSize()
-	{
-		return this.xSize;
-	}
-	
-	public int getYSize()
-	{
-		return this.ySize;
-	}
+    private int xSize;
+    private int ySize;
+    private int[][] tiles;
 
-	/**
-	 * Init Board with Size (ex: 3x3)
-	 * 
-	 * @param wSize
-	 * @param hSize
-	 */
-	public TileBoard(int wSize, int hSize) {
-		this.xSize = wSize;
-		this.ySize = hSize;
-		
-		this.tiles = tileValuesForSize(this.xSize, this.ySize);
-	}
+    public int getXSize() {
+        return this.xSize;
+    }
 
-	private boolean isCoordinateInBound(Point coor) {
-		return (coor.x > 0 && coor.x <= this.xSize && coor.y > 0 && coor.y <= this.ySize);
-	}
+    public int getYSize() {
+        return this.ySize;
+    }
 
-	private int[][] tileValuesForSize(int xSize, int ySize) {
-		int value = 1;
+    // Initialize Board with Size (e.g. 3x3)
+    public TileBoard(int wSize, int hSize) {
+        this.xSize = wSize;
+        this.ySize = hSize;
 
-		int[][] newTiles = new int[xSize][ySize];
+        this.tiles = tileValuesForSize(this.xSize, this.ySize);
+    }
 
-		for (int i = 0; i < xSize; i++) {
-			for (int j = 0; j < ySize; j++) {
-				newTiles[i][j] = (value != xSize * ySize ? value++ : 0);
-			}
-		}
+    private boolean isCoordinateInBound(Point coor) {
+        return (coor.x > 0 && coor.x <= this.xSize && coor.y > 0 && coor.y <= this.ySize);
+    }
 
-		return newTiles;
-	}
+    private int[][] tileValuesForSize(int xSize, int ySize) {
+        int value = 1;
 
-	public int getTilesCount() {
-		return tiles.length;
-	}
+        int[][] newTiles = new int[xSize][ySize];
 
-	public void setTileAtCoordinate(Point coor, int value) {
-		if (this.isCoordinateInBound(coor)) {
-			this.tiles[coor.y - 1][coor.x - 1] = value;
-		}
-	}
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                newTiles[i][j] = (value != xSize * ySize ? value++ : 0);
+            }
+        }
 
-	public int tileAtCoordinate(Point coor) {
-		if (this.isCoordinateInBound(coor)) {
-			return this.tiles[coor.y - 1][coor.x - 1];
-		}
+        return newTiles;
+    }
 
-		return -1; // null
-	}
+    public int getTilesCount() {
+        return tiles.length;
+    }
 
-	public boolean canMoveTile(Point coor) {
-		return (this.tileAtCoordinate(new Point(coor.x, coor.y - 1)) == 0 || // upper neighbor
-				this.tileAtCoordinate(new Point(coor.x + 1, coor.y)) == 0 || // right neighbor
-				this.tileAtCoordinate(new Point(coor.x, coor.y + 1)) == 0 || // lower neighbor
-				this.tileAtCoordinate(new Point(coor.x - 1, coor.y)) == 0 // left neighbor
-		);
-	}
+    public void setTileAtCoordinate(Point coor, int value) {
+        if (this.isCoordinateInBound(coor)) {
+            this.tiles[coor.y - 1][coor.x - 1] = value;
+        }
+    }
 
-	public Point shouldMove(boolean move, Point coor) {
-		if (!this.canMoveTile(coor)) {
-			return null;
-		}
+    public int tileAtCoordinate(Point coord) {
+        if (this.isCoordinateInBound(coord)) {
+            return this.tiles[coord.y - 1][coord.x - 1];
+        }
 
-		Point lowerNeighbor = new Point(coor.x, coor.y + 1);
-		Point rightNeighbor = new Point(coor.x + 1, coor.y);
-		Point upperNeighbor = new Point(coor.x, coor.y - 1);
-		Point leftNeighbor = new Point(coor.x - 1, coor.y);
+        return -1; // null
+    }
 
-		Point neighbor = null;
+    public boolean canMoveTile(Point coor) {
+        return (this.tileAtCoordinate(new Point(coor.x, coor.y - 1)) == 0 || // upper neighbor
+                this.tileAtCoordinate(new Point(coor.x + 1, coor.y)) == 0 || // right neighbor
+                this.tileAtCoordinate(new Point(coor.x, coor.y + 1)) == 0 || // lower neighbor
+                this.tileAtCoordinate(new Point(coor.x - 1, coor.y)) == 0 // left neighbor
+        );
+    }
 
-		if (this.tileAtCoordinate(lowerNeighbor) == 0) {
-			neighbor = lowerNeighbor;
-		} else if (this.tileAtCoordinate(rightNeighbor) == 0) {
-			neighbor = rightNeighbor;
-		} else if (this.tileAtCoordinate(upperNeighbor) == 0) {
-			neighbor = upperNeighbor;
-		} else if (this.tileAtCoordinate(leftNeighbor) == 0) {
-			neighbor = leftNeighbor;
-		}
+    public Point shouldMove(boolean move, Point coord) {
+        if (!this.canMoveTile(coord)) {
+            return null;
+        }
 
-		if (move) {
-			// Swap current tile with blank tile
-			int value = this.tileAtCoordinate(coor);
-			this.setTileAtCoordinate(coor, this.tileAtCoordinate(neighbor));
-			this.setTileAtCoordinate(neighbor, value);
-		}
+        Point lowerNeighbor = new Point(coord.x, coord.y + 1);
+        Point rightNeighbor = new Point(coord.x + 1, coord.y);
+        Point upperNeighbor = new Point(coord.x, coord.y - 1);
+        Point leftNeighbor = new Point(coord.x - 1, coord.y);
 
-		return neighbor;
-	}
+        Point neighbor = null;
 
-	/**
-	 * Shuffle the TileBoard
-	 */
-	public void shuffle() {
-		int times = 200;
+        if (this.tileAtCoordinate(lowerNeighbor) == 0) {
+            neighbor = lowerNeighbor;
+        } else if (this.tileAtCoordinate(rightNeighbor) == 0) {
+            neighbor = rightNeighbor;
+        } else if (this.tileAtCoordinate(upperNeighbor) == 0) {
+            neighbor = upperNeighbor;
+        } else if (this.tileAtCoordinate(leftNeighbor) == 0) {
+            neighbor = leftNeighbor;
+        }
 
-		for (int t = 0; t < times; t++) {
-			List<Point> validMoves = new ArrayList<Point>();
+        if (move) {
+            // Swap current tile with blank tile
+            int value = this.tileAtCoordinate(coord);
+            this.setTileAtCoordinate(coord, this.tileAtCoordinate(neighbor));
+            this.setTileAtCoordinate(neighbor, value);
+        }
 
-			for (int j = 1; j <= this.ySize; j++) {
-				for (int i = 1; i <= this.xSize; i++) {
-					Point p = new Point(i, j);
-					if (this.canMoveTile(p)) {
-						validMoves.add(p);
-					}
-				}
-			}			
-		
-			
-			// Get random 1 valid move in arrays			
-			int randInt = new Random().nextInt(validMoves.size());						
+        return neighbor;
+    }
 
-			Point coor = validMoves.get(randInt);
-			this.shouldMove(true, coor);
-		}
-	}
+    // Shuffle the TileBoard
+    public void shuffle() {
+        int times = 200;
 
-	/**
-	 * Check if the order of all tiles are correct
-	 * @return true/false
-	 */
-	public boolean isAllTilesCorrect() {
-		int v = 1;
-		boolean correct = true;
+        for (int t = 0; t < times; t++) {
+            List<Point> validMoves = new ArrayList<>();
 
-		checkCorrect: {
-			for (int i = 0; i < this.xSize; i++) {
-				for (int j = 0; j < this.ySize; j++) {
-					// Check if the first tile is not equal 1
-					if (this.tiles[i][j] != v) {
-						correct = false;
-						break checkCorrect;
-					}
-					else
-					{
-						v = (v < ((this.xSize * this.ySize) - 1) ? v + 1: 0);
-					}
-				}
-			}
-		}
+            for (int j = 1; j <= this.ySize; j++) {
+                for (int i = 1; i <= this.xSize; i++) {
+                    Point p = new Point(i, j);
+                    if (this.canMoveTile(p)) {
+                        validMoves.add(p);
+                    }
+                }
+            }
 
-		return correct;
-	}
+            // Get random 1 valid move in arrays
+            int randInt = new Random().nextInt(validMoves.size());
+
+            Point coord = validMoves.get(randInt);
+            this.shouldMove(true, coord);
+        }
+    }
+
+    // Check if the order of all tiles are correct
+    public boolean isAllTilesCorrect() {
+        int v = 1;
+        boolean correct = true;
+
+        checkCorrect: {
+            for (int i = 0; i < this.xSize; i++) {
+                for (int j = 0; j < this.ySize; j++) {
+                    // Check if the first tile is not equal 1
+                    if (this.tiles[i][j] != v) {
+                        correct = false;
+                        break checkCorrect;
+                    } else {
+                        v = (v < ((this.xSize * this.ySize) - 1) ? v + 1: 0);
+                    }
+                }
+            }
+        }
+
+        return correct;
+    }
 
 }

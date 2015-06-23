@@ -1,53 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Puzzle</string>
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="title_activity_main">MainActivity</string>
-	
-	<string name="content_info">ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。ここにサービス説明が入ります。</string>
-	<string name="btnSkip">スキップ</string>
-	
-	<string name="title_activity_top">アプリタイトル</string>
-	<string name="btnStart">スタート</string>
-	<string name="btnRanking">ランキング</string>
-	<string name="txtStage">ステージ１</string>
-	
-	<string name="txtResultStage">STAGE 1</string>
-	<string name="lbResult">結果：</string>
-	<string name="txtResult">秒</string>
-	<string name="lbTimeRanking">クリア時間ランキング   :</string>
-	<string name="txtTimeRanking">位/</string>
-	<string name="lbFirsComeRanking">先着ランキング       :</string>	
-	
-	<string name="txtId">●ID</string>
-	<string name="txtPassword">●パスワード</string>
-	<string name="txtPasswordReminder">→パスワードを忘れた方はこちら</string>
-	<string name="mesError">入力された内容に誤りがあります。</string>
-	<string name="mesError409">入力されたIDは既に使用済みです。別のIDをご入力ください</string>	
-		
-	<string name="txtPasswordReminderDecs">パスワードをお忘れの方は、下記フォームより空メールを送信ください。折り返し自動メールにてパスワードをご連絡致します。</string>
-	<string name="txtPasswordReminderEmail">●登録メールアドレス</string>	
-		
-	<string name="txtEmailAddress">●メールアドレス</string>
-	<string name="txtNickName">●ニックネーム</string>
-	<string name="mesDecsUseID">※登録後に変更できません。</string>
-	<string name="mesDecsNickName">※登録後に変更できません。</string>
-		
-	
-	<string name="btnLogin">ログイン</string>
-	<string name="btnSignUp">新規登録</string>
-	
-	<string name="btnSend">送信</string>
-	<string name="btnOk">OK</string>
-	
-	<string name="btnHome">ホーム</string>
-	<string name="textRanking">ランキング</string>
-	<string name="btnResetRanking">先着リセット</string>
-	<string name="tab_Time">時間</string>
-	<string name="tab_FirstCome">先着</string>
-	<string name="sbu_Tab_Time">時間 (全500人中)</string>
-	<string name="sbu_Tab_FirstCome">先着 (全500人中)</string>
-	
-	<string name="place">位</string>	
+  <!-- Appiaries -->
+  <string name="appiaries__datastore_id">appiaries_sample</string>
+  <string name="appiaries__application_id">puzzle</string>
+  <string name="appiaries__application_token">app224c1e94977426cc4184be3e5e</string>
+
+  <!-- Common (App Global) -->
+  <string name="app_name">Puzzle</string>
+  <string name="progress__processing">処理中&#8230;</string>
+  <string name="progress__loading">ロード中&#8230;</string>
+  <string name="progress__creating">作成中&#8230;</string>
+  <string name="progress__updating">更新中&#8230;</string>
+  <string name="progress__deleting">削除中&#8230;</string>
+  <string name="form_filed__id">●ID</string>
+  <string name="form_field__id_annotation">※登録後に変更できません。</string>
+  <string name="form_field__email">●メールアドレス</string>
+  <string name="form_filed__password">●パスワード</string>
+  <string name="form_field__forgot_password">→パスワードを忘れた方はこちら</string>
+  <string name="form_field__nickname">●ニックネーム</string>
+  <string name="form_field__nickname_annotation">※登録後に変更できません。</string>
+  <string name="message_error__wrong_input">入力された内容に誤りがあります。</string>
+  <string name="message_error__invalid_password">パスワードが不正です。</string>
+  <string name="message_error__duplicated_id">IDまたはメールアドレスが重複しています。</string>
+  <string name="message_error__authentication_failure">認証に失敗しました。</string>
+  <string name="message_error__unexpected_error">予期せぬエラーが発生しました。\nしばらく経ってから再度アクセスしてください。</string>
+  <string name="message_error__empty_task_title">タスクを入力してください。</string>
+  <string name="message_success__created">作成しました</string>
+  <string name="message_success__updated">更新しました</string>
+  <string name="message_success__deleted">削除しました</string>
+  <string name="message_success__signed_up">サインアップしました</string>
+  <string name="message_success__logged_in">ログインしました</string>
+  <string name="message_success__cancelled">キャンセルされました</string>
+
+  <!-- CountDownTextView -->
+  <string name="count_down__time">"Time: "</string>
+
+  <!-- BaseActivity -->
+  <string name="base__ok_button">OK</string>
+
+  <!-- ErrorActivity -->
+  <string name="error__abort_button">アプリを終了する</string>
+
+  <!-- IntroductionActivity -->
+  <string name="intro__skip_button">スキップ</string>
+  <string name="intro__contents"/>
+
+  <!-- LoginActivity -->
+  <string name="login__login_button">ログイン</string>
+  <string name="login__signup_button">新規登録</string>
+  <string name="login__default_login_id"></string>
+  <string name="login__default_password"></string>
+
+  <!-- PasswordReminderActivity -->
+  <string name="password_reminder__send_button">送信</string>
+  <string name="password_reminder__description">パスワードをお忘れの方は、下記フォームより空メールを送信ください。折り返し自動メールにてパスワードをご連絡致します。</string>
+  <string name="password_reminder__form_field_registered_email">●登録メールアドレス</string>
+  <string name="password_reminder__reset_confirm_title">ご確認</string>
+  <string name="password_reminder__reset_confirm_message">ご案内のためのメールが送信されました。ご確認ください。</string>
+
+  <!-- PlayActivity -->
+  <string name="play__menu_sample">見本</string>
+  <string name="play__progress_sending">結果を送信中です&#8230;</string>
+  <string name="play__timed_up_confirm_title">ゲームオーバー</string>
+  <string name="play__timed_up_confirm_message">残念！時間切れです</string>
+
+  <!-- PlayResultActivity -->
+  <string name="play_result__title">ステージクリア</string>
+  <string name="play_result__home_button">ホーム</string>
+  <string name="play_result__ranking_button">ランキング</string>
+  <string name="play_result__result_label">結果：</string>
+  <string name="play_result__time_ranking_label">クリア時間ランキング   :</string>
+  <string name="play_result__first_come_ranking_label">先着ランキング       :</string>
+  <string name="play_result__rank_suffix">位/</string>
+  <string name="play_result__total_suffix">人中</string>
+  <string name="play_result__score_suffix">秒</string>
+
+  <!-- RankingActivity -->
+  <string name="ranking__title">ランキング</string>
+  <string name="ranking__menu_reset">先着リセット</string>
+  <string name="ranking__tab0">時間</string>
+  <string name="ranking__tab1">先着</string>
+  <string name="ranking__tab0_with_total">時間 (全%d人中)</string>
+  <string name="ranking__tab1_with_total">先着 (全%d人中)</string>
+  <string name="ranking__reset_confirm_title">確認</string>
+  <string name="ranking__reset_confirm_message">先着ランキングをリセットしますか。</string>
+  <string name="ranking__reset_confirm_positive_button">OK</string>
+  <string name="ranking__reset_confirm_negative_button">Cancel</string>
+
+
+  <!-- List Row Time Ranking -->
+  <string name="list_row_time_ranking__place">位</string>
+  <string name="list_row_time_ranking__nickname_default">プレイヤー１</string>
+  <string name="list_row_time_ranking__time_default">101 sec</string>
+
+  <!-- List Row First Come Ranking -->
+  <string name="list_row_first_come_ranking__place">位</string>
+  <string name="list_row_first_come_ranking__nickname_default">プレイヤー１</string>
+
+  <!-- SampleActivity -->
+  <string name="sample__timed_up_confirm_title">ゲームオーバー</string>
+  <string name="sample__timed_up_confirm_message">残念！時間切れです</string>
+
+  <!-- SplashActivity -->
+
+  <!-- SignUpActivity -->
+  <string name="signup__signup_confirm_title">ご確認</string>
+  <string name="signup__signup_confirm_message">ご案内のためのメールが送信されました。ご確認ください。</string>
+  <string name="signup__ok_button">OK</string>
+  <string name="signup__default_login_id"></string>
+  <string name="signup__default_email"></string>
+  <string name="signup__default_password"></string>
+  <string name="signup__default_nickname"></string>
+
+  <!-- TopActivity -->
+  <string name="top__start_button">スタート</string>
+  <string name="top__ranking_button">ランキング</string>
+
+  <!-- TimeRankingAdapter -->
+  <string name="time_ranking__score_suffix">" 秒"</string>
+
 </resources>

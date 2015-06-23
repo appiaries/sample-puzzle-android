@@ -1,6 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2014 Appiaries Corporation. All rights reserved.
- *******************************************************************************/
+//
+// Copyright (c) 2014 Appiaries Corporation. All rights reserved.
+//
 package com.appiaries.puzzle.adapters;
 
 import java.util.List;
@@ -10,88 +10,68 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.appiaries.puzzle.R;
-import com.appiaries.puzzle.common.APIHelper;
-import com.appiaries.puzzle.jsonmodels.FirstComeRanking;
-import android.widget.ArrayAdapter;
+import com.appiaries.puzzle.common.PreferenceHelper;
+import com.appiaries.puzzle.models.FirstComeRanking;
 
 public class FirstComeRankingAdapter extends ArrayAdapter<FirstComeRanking> {
 
-	private final Context context;
-	private List<FirstComeRanking> dataSource;
+    private static class ViewHolder {
+        public TextView rank;
+        public TextView nickname;
+    }
 
-	public FirstComeRankingAdapter(Context context, List<FirstComeRanking> values) {
-		super(context, R.layout.senchaku_row, values);
+    private ViewHolder mViewHolder = new ViewHolder();
 
-		this.context = context;
-		this.dataSource = values;
-	}
+    private final Context mContext;
+    private List<FirstComeRanking> mDataSource;
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    public FirstComeRankingAdapter(Context context, List<FirstComeRanking> values) {
+        super(context, R.layout.list_raw_first_come_ranking, values);
+        mContext = context;
+        mDataSource = values;
+    }
 
-		PlanetHolder holder = new PlanetHolder();
-		if (convertView == null) {
-			// set up the ViewHolder
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-			convertView = inflater
-					.inflate(R.layout.senchaku_row, parent, false);
+        if (convertView == null) {
+            // set up the ViewHolder
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.list_raw_first_come_ranking, parent, false);
 
-			TextView txtRank = (TextView) convertView
-					.findViewById(R.id.txtRank);
-			TextView txtNickName = (TextView) convertView
-					.findViewById(R.id.txtNickName);
+            mViewHolder.rank     = (TextView) convertView.findViewById(R.id.text_rank);
+            mViewHolder.nickname = (TextView) convertView.findViewById(R.id.text_nickname);
 
-			holder.txtRank = txtRank;
-			holder.txtNickName = txtNickName;
+            // store the object with the view.
+            convertView.setTag(mViewHolder);
+        } else {
+            // we've just avoided calling findViewById() on resource every time
+            // just use the viewHolder
+            mViewHolder = (ViewHolder) convertView.getTag();
+        }
 
-			// store the object with the view.
-			convertView.setTag(holder);
-		} else {
-			// we've just avoided calling findViewById() on resource everytime
-			// just use the viewHolder
-			holder = (PlanetHolder) convertView.getTag();
-		}
+        // get data object for current row
+        if (mDataSource.size() > 0) {
+            FirstComeRanking ranking = mDataSource.get(position);
+            if (ranking != null) {
+                mViewHolder.rank.setText(String.valueOf(position + 1));
+                mViewHolder.nickname.setText(ranking.getNickname());
+                if (ranking.getPlayerID().equals(PreferenceHelper.loadPlayerId(mContext))) {
+                    mViewHolder.nickname.setTypeface(Typeface.DEFAULT_BOLD);
+                } else {
+                    mViewHolder.nickname.setTypeface(Typeface.DEFAULT);
+                }
+            }
+        }
 
-		// get data object for current row
-		if(dataSource.size() > 0){
-			FirstComeRanking info = dataSource.get(position);
-			if (info != null) {
-				holder.txtRank.setText((position + 1) + "");
-				holder.txtNickName.setText(info.getNickname());
-				if (info.getUserId().equals(APIHelper.getStringInLocalStorage(
-						context, "user_id")))
-				{
-					holder.txtNickName.setTypeface(Typeface.DEFAULT_BOLD);
-				}
-				else
-				{
-					holder.txtNickName.setTypeface(Typeface.DEFAULT);
-				}
-			}
-		}
-		
+        return convertView;
+    }
 
-		return convertView;
-	}
-
-	/* *********************************
-	 * We use the holder pattern It makes the view faster and avoid finding the
-	 * component *********************************
-	 */
-	private static class PlanetHolder {
-
-		public TextView txtRank;
-		public TextView txtNickName;
-	}
-
-	// refresh Adapter Method calling in Homepage Activity
-
-	public synchronized void refreshAdapter(List<FirstComeRanking> dataitems) {
-		dataSource.clear();
-	}
+    public synchronized void refreshAdapter(List<FirstComeRanking> dataitems) {
+        mDataSource.clear();
+    }
 
 }

@@ -1,74 +1,85 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="match_parent" >
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_width="fill_parent"
+               android:layout_height="match_parent"
+               android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        style="@style/LayoutVerticalStyle"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
 
-        <LinearLayout
-            style="@style/LayoutVerticalStyle"
-            android:layout_gravity="end" >
+      <TextView
+          android:id="@+id/text_error_messages"
+          android:text="@string/message_error__wrong_input"
+          style="@style/ErrorLabelStyle"
+          android:layout_marginBottom="10dp"
+          android:visibility="gone" />
 
-            <LinearLayout
-                style="@style/LayoutVerticalStyle"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" >
+      <TextView
+          android:text="@string/form_filed__id"
+          style="@style/SettingLabelStyle"
+          android:textSize="8pt" />
 
-                <TextView
-                    android:id="@+id/validation"
-                    style="@style/ErrorLableStyle"
-                    android:layout_marginBottom="10dp"
-                    android:text="@string/mesError"
-                    android:visibility="gone" />
+      <EditText
+          android:id="@+id/edit_login_id"
+          android:inputType="textNoSuggestions"
+          android:maxLength="20"
+          style="@style/HomeTxtDescStyle"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:layout_gravity="start|center_horizontal"
+          android:background="@drawable/edit_text_border_style"
+          android:paddingLeft="5dp" />
 
-                <TextView
-                    style="@style/SettingLableStyle"
-                    android:text="@string/txtId"
-                    android:textSize="8pt" />
+      <TextView
+          android:text="@string/form_filed__password"
+          style="@style/SettingLabelStyle"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="5dp"
+          android:textSize="8pt" />
 
-                <EditText
-                    android:id="@+id/txtId"
-                    style="@style/HomeTxtDescStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_gravity="start|center_horizontal"
-                    android:background="@drawable/edit_text_border_style"
-                    android:maxLength="20" />
+      <EditText
+          android:id="@+id/edit_password"
+          android:inputType="textPassword"
+          android:maxLength="20"
+          style="@style/HomeTxtDescStyle"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:layout_gravity="start|center_horizontal"
+          android:background="@drawable/edit_text_border_style"
+          android:paddingLeft="5dp" />
 
-                <TextView
-                    style="@style/SettingLableStyle"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/txtPassword"
-                    android:textSize="8pt" />
+      <TextView
+          android:id="@+id/text_forgot_password"
+          style="@style/txtPasswordReminder"
+          android:layout_marginBottom="10dp"
+          android:layout_marginTop="10dp"
+          android:autoLink="all"
+          android:clickable="true"
+          android:linksClickable="true"
+          android:text="@string/form_field__forgot_password"
+          android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <EditText
-                    android:id="@+id/txtPassword"
-                    style="@style/HomeTxtDescStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_gravity="start|center_horizontal"
-                    android:background="@drawable/edit_text_border_style"
-                    android:inputType="textPassword"
-                    android:maxLength="20" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnLogin"
-                style="@style/ButtonStyle"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/my_button"
-                android:text="@string/btnLogin" />
-
-            <Button
-                android:id="@+id/btnSignUp"
-                style="@style/ButtonStyle"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/my_button"
-                android:text="@string/btnSignUp" />
-        </LinearLayout>
     </LinearLayout>
 
-</ScrollView>
+    <Button
+        android:id="@+id/button_login"
+        android:text="@string/login__login_button"
+        style="@style/ButtonStyle"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/my_button" />
+
+    <Button
+        android:id="@+id/button_signup"
+        android:text="@string/login__signup_button"
+        style="@style/ButtonStyle"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/my_button" />
+
+  <LinearLayout
+      style="@style/LayoutVerticalStyle"
+      android:gravity="center_horizontal" >
+  </LinearLayout>
+
+</LinearLayout>
+

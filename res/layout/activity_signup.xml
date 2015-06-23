@@ -1,0 +1,89 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent">
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+
+    <LinearLayout
+        style="@style/LayoutVerticalStyle"
+        android:layout_width="match_parent"
+        android:layout_gravity="right">
+
+      <LinearLayout
+          style="@style/LayoutVerticalStyle"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="10dp">
+        <TextView
+            android:id="@+id/text_error_messages"
+            style="@style/ErrorLabelStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/text_email_field_label"
+            style="@style/SettingLabelStyle"
+            android:text="@string/form_field__email" />
+        <EditText
+            android:id="@+id/edit_email"
+            style="@style/HomeTxtDescStyle"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_border_style" />
+        <TextView
+            android:id="@+id/text_login_id_field_label"
+            style="@style/SettingLabelStyle"
+            android:text="@string/form_filed__id" />
+        <TextView
+            android:id="@+id/text_login_id_description_label"
+            style="@style/SettingLabelStyle"
+            android:layout_marginBottom="10dp"
+            android:text="@string/form_field__id_annotation" />
+        <EditText
+            android:id="@+id/edit_login_id"
+            style="@style/HomeTxtDescStyle"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_border_style" />
+        <TextView
+            android:id="@+id/text_nickname_field_label"
+            style="@style/SettingLabelStyle"
+            android:text="@string/form_field__nickname" />
+        <TextView
+            android:id="@+id/text_nickname_description_label"
+            style="@style/SettingLabelStyle"
+            android:layout_marginBottom="10dp"
+            android:text="@string/form_field__nickname_annotation" />
+        <EditText
+            android:id="@+id/edit_nickname"
+            style="@style/HomeTxtDescStyle"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_border_style" />
+        <TextView
+            android:id="@+id/text_password_field_label"
+            style="@style/SettingLabelStyle"
+            android:text="@string/form_filed__password" />
+        <EditText
+            android:id="@+id/edit_password"
+            style="@style/HomeTxtDescStyle"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_border_style"
+            android:password="true" />
+      </LinearLayout>
+
+      <LinearLayout
+          style="@style/LayoutVerticalStyle"
+          android:gravity="center_horizontal">
+        <Button
+            android:id="@+id/button_signup"
+            style="@style/ButtonStyle"
+            android:background="@drawable/my_button"
+            android:text="@string/signup__ok_button" />
+      </LinearLayout>
+
+    </LinearLayout>
+
+  </LinearLayout>
+
+</ScrollView>
