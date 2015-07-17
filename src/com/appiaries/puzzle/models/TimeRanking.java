@@ -13,7 +13,7 @@ public class TimeRanking extends ABDBObject {
 
     public static class Field extends ABDBObject.Field {
         public static final ABField STAGE_ID  = new ABField("stage_id", String.class);
-        public static final ABField PLAYER_ID = new ABField("user_id", String.class);
+        public static final ABField PLAYER_ID = new ABField("player_id", String.class);
         public static final ABField NICKNAME  = new ABField("nickname", String.class);
         public static final ABField SCORE     = new ABField("score", int.class);
     }
@@ -48,7 +48,11 @@ public class TimeRanking extends ABDBObject {
     }
 
     public String getPlayerID() {
-        return get(Field.PLAYER_ID);
+        String id = get(Field.PLAYER_ID);
+        if (id == null) {
+            id = get("user_id"); //XXX: for v1.4
+        }
+        return id;
     }
     public void setPlayerID(String playerID) {
         put(Field.PLAYER_ID, playerID);

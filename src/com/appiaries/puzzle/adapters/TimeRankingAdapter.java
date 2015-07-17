@@ -65,7 +65,8 @@ public class TimeRankingAdapter extends ArrayAdapter<TimeRanking> {
         if (ranking != null) {
             mViewHolder.rank.setText(String.valueOf(rank));
             mViewHolder.nickname.setText(ranking.getNickname());
-            if (ranking.getPlayerID().equals(PreferenceHelper.loadPlayerId(mContext))) {
+            String playerID = ranking.getPlayerID();
+            if (playerID != null && playerID.equals(PreferenceHelper.loadPlayerId(mContext))) {
                 mViewHolder.nickname.setTypeface(Typeface.DEFAULT_BOLD);
             } else {
                 mViewHolder.nickname.setTypeface(Typeface.DEFAULT);
